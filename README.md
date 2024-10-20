@@ -5,9 +5,9 @@ CloudNativePG Helm Charts for Standalone, Backup, PITR and Replica Cluster.
 
 # Prerequisites
 
-#@ CloudNativePG Helm Charts
+## CloudNativePG Helm Charts
 
-[![Stack Overflow](https://img.shields.io/badge/stackoverflow-cloudnative--pg-blue?logo=stackoverflow&logoColor=%23F48024&link=https%3A%2F%2Fstackoverflow.com%2Fquestions%2Ftagged%2Fcloudnative-pg)][stackoverflow]
+[![Stack Overflow](https://img.shields.io/badge/stackoverflow-cloudnative--pg-blue?logo=stackoverflow&logoColor=%23F48024)](https://stackoverflow.com/questions/tagged/cloudnative-pg) [![GitHub License](https://img.shields.io/github/license/cloudnative-pg/charts)](https://github.com/cloudnative-pg/charts/blob/main/LICENSE)
 
 ## Operator chart
 
