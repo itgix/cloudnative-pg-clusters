@@ -33,7 +33,7 @@ Helm charts to install a CloudNativePG database cluster.
 
 ```console
 helm upgrade --install cnpg-cluster \
-  helm/cnpg-cluster \
+  charts/cnpg-cluster \
   --namespace cnpg-cluster \
   --create-namespace \
 ```
