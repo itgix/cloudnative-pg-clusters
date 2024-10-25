@@ -41,21 +41,21 @@ helm upgrade --install cnpg-cluster \
 
 ```console
 helm upgrade --install cnpg-cluster-backup \
-helm/cnpg-cluster-backup \
+charts/cnpg-cluster-backup \
 --namespace cnpg-backup \
 --create-namespace \
 ```
 
 ```console
 helm upgrade --install cnpg-cluster-pitr \
-helm/cnpg-cluster-pitr \
+charts/cnpg-cluster-pitr \
 --namespace cnpg-pitr \
 --create-namespace \
 ```
 
 ```console
 helm upgrade --install cnpg-cluster-replica \
-helm/cnpg-cluster-replica \
+charts/cnpg-cluster-replica \
 --namespace cnpg-replica \
 --create-namespace \
 ```
