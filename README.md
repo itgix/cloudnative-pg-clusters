@@ -33,31 +33,30 @@ Helm charts to install a CloudNativePG database cluster.
 
 ```console
 helm upgrade --install cnpg-cluster \
-  helm/cnpg-cluster 
+  helm/cnpg-cluster \
   --namespace cnpg-cluster \
   --create-namespace \
-
 ```
 
 ```console
 helm upgrade --install cnpg-cluster-backup \
-charts/cnpg-cluster-backup \
---namespace cnpg-backup \
---create-namespace \
+  charts/cnpg-cluster-backup \
+  --namespace cnpg-backup \
+  --create-namespace \
 ```
 
 ```console
 helm upgrade --install cnpg-cluster-pitr \
-charts/cnpg-cluster-pitr \
---namespace cnpg-pitr \
---create-namespace \
+  charts/cnpg-cluster-pitr \
+  --namespace cnpg-pitr \
+  --create-namespace \
 ```
 
 ```console
 helm upgrade --install cnpg-cluster-replica \
-charts/cnpg-cluster-replica \
---namespace cnpg-replica \
---create-namespace \
+  charts/cnpg-cluster-replica \
+  --namespace cnpg-replica \
+  --create-namespace \
 ```
 
 Clusters names and namespaces can be changed according to the purpose of the cluster/databse.
