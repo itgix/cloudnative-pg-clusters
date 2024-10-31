@@ -1,0 +1,137 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "cnpg-cluster.fullname" . }}
+  namespace: {{ .Release.Namespace }} 
+  labels:
+    {{- include "cnpg-cluster.labels" . | nindent 4 }}
+spec:
+  logLevel: {{ .Values.logLevel }}
+  instances: {{ .Values.instances }} 
+  {{- if .Values.image.repository }}
+  imageName: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+  {{- end }}
+  imagePullPolicy: {{ .Values.image.pullPolicy }}  
+
+  storage:
+    storageClass: {{ .Values.storage.storageClass }}  
+    size: {{ .Values.storage.size }}  
+  walStorage:
+    storageClass: {{ .Values.walStorage.storageClass }}   
+    size: {{ .Values.walStorage.size }}  
+
+  postgresql:
+    parameters: 
+      {{.Values.postgresql.parameters | toYaml | nindent 6 }}
+   
+  bootstrap:
+    {{- if .Values.bootstrap.initdb }}
+    initdb:
+      {{.Values.bootstrap.initdb | toYaml | nindent 6 }}
+    {{- else if .Values.bootstrap.recovery }}
+    recovery:
+      # Recovery object store containing WAL archive and base backups
+      source: {{ .Values.bootstrap.recovery.source }}
+      {{- if .Values.point_in_time_recovery }}
+      recoveryTarget:
+        # Time base target for the recovery
+        targetTime:  {{ .Values.bootstrap.recovery.recoveryTarget.targetTime }}
+        {{- end }}
+    {{- else if .Values.bootstrap.pg_basebackup }} 
+    pg_basebackup:
+      source: {{ .Values.bootstrap.pg_basebackup.source }}
+    {{- else }}
+    {{- end }}
+
+  {{- with .Values.externalClusters }}
+  externalClusters:
+  - name: {{ .name }} 
+    {{- if $.Values.bootstrap.recovery }}
+    barmanObjectStore:
+      endpointURL: {{ .endpointURL }}
+      endpointCA: {{ .endpointCA }}
+      destinationPath: {{ .destinationPath }}
+      serverName: {{ .serverName }}
+      wal:
+        maxParallel: {{ .wal.maxParallel }}
+
+      {{- if .s3Credentials }}    
+      {{- with .s3Credentials }}
+      s3Credentials:
+        accessKeyId:
+          name: {{ .accessKeyId.name }}
+          key: {{ .accessKeyId.key }}
+        secretAccessKey:
+          name: {{ .secretAccessKey.name }}
+          key: {{ .secretAccessKey.key }}
+      {{- end }}
+      {{- else if .azureCredentials }}
+      azureCredentials:
+        connectionString:
+          name: {{ .azureCredentials.connectionString.name }}   
+          key: {{ .azureCredentials.connectionString.key }}   
+      {{- else }}
+      {{- end }}
+    {{- end }}
+
+    {{- if $.Values.bootstrap.pg_basebackup }} 
+    connectionParameters:
+      {{.connectionParameters | toYaml | nindent 6 }}
+    sslKey:
+      name: {{ .sslKey.name }}
+      key: {{ .sslKey.key }}
+    sslCert:
+      name: {{ .sslCert.name }} 
+      key:  {{ .sslCert.key }}
+    sslRootCert:
+      name: {{ .sslRootCert.name }}
+      key: {{ .sslRootCert.key }}
+    {{- end }}
+  {{- end }}
+  
+  {{- if .Values.replica.enabled }}
+  replica:
+    enabled: {{ .Values.replica.enabled}}
+    source:   {{ .Values.replica.source }}
+  {{- end }} 
+    
+  {{- if .Values.backup.enabled }}
+  {{- with .Values.backup }}
+  backup:
+    retentionPolicy: {{ .retentionPolicy }}
+    barmanObjectStore:
+      endpointURL: {{ .endpointURL }}
+      endpointCA: {{ .endpointCA }}
+      destinationPath: {{ .destinationPath }}
+      serverName: {{ .serverName }}
+      wal:
+        compression: {{ .wal.compression }}
+      data:
+        compression:  {{ .data.compression }}
+        immediateCheckpoint: true
+        jobs: {{ .data.jobs }}
+      {{- if .s3Credentials }}
+      s3Credentials:    
+        accessKeyId:
+          name: {{ .accessKeyId.name }}
+          key: {{ .accessKeyId.key }}
+        secretAccessKey:
+          name:  {{ .secretAccessKey.name }}
+          key:  {{ .secretAccessKey.key }}
+      {{- else if .azureCredentials }}
+      {{- with .azureCredentials }}
+      azureCredentials:
+        connectionString:
+          name: {{ .connectionString.name }}   
+          key: {{ .connectionString.key }}    
+      {{- end }}          
+      {{- else }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+
+  resources:
+    {{- toYaml .Values.resources | nindent 4 }}
+
+  monitoring:
+    enablePodMonitor: {{ .Values.monitoring.enablePodMonitor }} 

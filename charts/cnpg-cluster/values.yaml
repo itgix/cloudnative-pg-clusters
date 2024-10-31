@@ -1,0 +1,88 @@
+# Default values for standalone cnpg-cluster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+logLevel: info
+instances: 1
+
+image:
+  repository: ghcr.io/cloudnative-pg/postgresql
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "17.0"
+
+storage:
+  storageClass:
+  size: 1Gi
+walStorage:
+  storageClass:
+  size: 1Gi
+
+postgresql:
+  parameters: {}
+
+disaster_recovery: false
+point_in_time_recovery: false
+
+bootstrap:
+  recovery: {}
+  pg_basebackup: {}
+
+backup:
+  enabled: false
+  # barmanObjectStore:
+  # The path where to store the backup (i.e. s3://bucket/path/to/folder) this path,
+  # with different destination folders, will be used for WALs and for data --
+  destinationPath: ""
+  # RetentionPolicy is the retention policy to be used for backups and WALs (i.e. '60d').
+  # The retention policy is expressed in the form of XXu where XX is a positive integer and
+  # u is in [dwm] - days, weeks, months.
+  retentionPolicy: 30d
+  # (string) Endpoint to be used to upload data to the cloud, overriding the automatic endpoint discovery. Required in case of Minio.
+  endpointURL:
+  # (object) The credentials to use to upload data to Google Cloud Storage
+  # See: https://cloudnative-pg.io/documentation/1.17/api_reference/#GoogleCredentials
+  googleCredentials:
+    #gkeEnvironment:
+    #applicationCredentials:
+  # (object) The credentials to use to upload data to S3
+  # See: https://cloudnative-pg.io/documentation/1.17/api_reference/#S3Credentials
+  s3Credentials:
+    # accessKeyId:
+    # secretAccessKey:
+    # region:
+    # sessionToken:
+    # inheritFromIAMRole:
+  # (object) The credentials to use to upload data to Azure Blob Storage
+  # See: https://cloudnative-pg.io/documentation/1.17/api_reference/#AzureCredentials
+  azureCredentials:
+    # connectionString:
+    # storageAccount:
+    # storageKey:
+    # storageSasToken:
+    # inheritFromAzureAD:
+scheduledBackups: {}
+
+replica:
+  # Enable cluster replication
+  enabled: false
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+pooler: {}
+
+monitoring:
+  enablePodMonitor: false
