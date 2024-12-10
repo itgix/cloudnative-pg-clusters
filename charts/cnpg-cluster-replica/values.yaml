@@ -1,0 +1,111 @@
+cnpg-cluster:
+  # Default values for cnpg-cluster-replica.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  logLevel: info
+  instances: 1
+
+  image:
+    repository: ghcr.io/cloudnative-pg/postgresql
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "17.0"
+
+  storage:
+    storageClass: 
+    size: 2Gi
+  walStorage:
+    storageClass: 
+    size: 2Gi
+
+  postgresql:
+    parameters:
+      # Parameter max_wal_size (default 1GB) should be smaller than WAL volume size    
+      max_wal_size: "1GB" 
+      max_wal_senders: "16"
+      wal_keep_size: "128MB"
+      fsync: "on"
+      log_connections: "false"
+      log_disconnections: "false"
+      log_hostname: "false"
+
+  disaster_recovery: true
+  point_in_time_recovery: false
+  bootstrap:
+    recovery:
+      # Recovery object store containing WAL archive and base backups
+      source: example-cluster-backup
+
+  replica:
+    enabled: true
+    source: example-cluster-backup
+
+  externalClusters:
+    name: example-cluster-backup
+    destinationPath: "test"
+  # googleCredentials:
+  #   gkeEnvironment:
+  #   applicationCredentials:
+  # s3Credentials:
+  #   accessKeyId:
+  #   secretAccessKey:
+  #   region:
+    azureCredentials:
+      connectionString:
+        name: azure-creds
+        key: AZURE_BLOB_STRING
+    wal:
+      maxParallel: 8
+  # note the namespace 'default' in the host name `cluster-example-rw.default.svc`
+  # remember to change accordingly with the namespace of the main cluster
+    connectionParameters:
+      host: cnpg-cluster-rw.cnpg-cluster.svc
+      user: streaming_replica
+      sslmode: verify-full
+      dbname: app
+  # NOTE: if this cluster is created in a different namespace than the main cluster
+  # remember to create the `-replication` and `-ca` secrets in the follower namespace
+  # before creating the follower cluster
+    sslKey:
+      name: cnpg-cluster-replication
+      key: tls.key
+    sslCert:
+      name: cnpg-cluster-replication
+      key: tls.crt
+    sslRootCert:
+      name: cnpg-cluster-ca
+      key: ca.crt
+
+  backup:
+    enabled: false
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "1"
+    limits:
+      memory: "1Gi"
+      cpu: "2"
+
+  pooler:
+    instances: 1
+    type: rw
+    resources:
+      requests:
+        cpu: "0.2"
+        memory: 200Mi
+      limits:
+        cpu: "0.5"
+        memory: 500Mi
+
+    pgbouncer:
+      poolMode: session
+      parameters:
+        max_client_conn: "1000"
+        default_pool_size: "10"
+
+  monitoring:
+    enablePodMonitor: true
+  podAnnotations: {}
+  nodeSelector: {}

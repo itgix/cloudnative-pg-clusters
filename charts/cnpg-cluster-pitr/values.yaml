@@ -1,0 +1,89 @@
+cnpg-cluster:
+  # Default values for cnpg-cluster.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  logLevel: debug
+  instances: 1
+
+  image:
+    repository: ghcr.io/cloudnative-pg/postgresql
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "17.0"
+
+  storage:
+    storageClass:
+    size: 2Gi
+  walStorage:
+    storageClass:
+    size: 2Gi
+
+  postgresql:
+    parameters:
+      # Parameter max_wal_size (default 1GB) should be smaller than WAL volume size    
+      max_wal_size: "1GB"
+      max_wal_senders: "16"
+      wal_keep_size: "128MB"
+      fsync: "on"
+      log_connections: "false"
+      log_disconnections: "false"
+      log_hostname: "false"
+      checkpoint_timeout: "15min" # default: 5min
+
+  disaster_recovery: true
+  point_in_time_recovery: true
+  bootstrap:
+    recovery:
+      # Recovery object store containing WAL archive and base backups
+      source: example-cluster-backup
+      recoveryTarget:
+        # Time base target for the recovery
+        targetTime: ""  # example format "2024-01-15 23:58:18.0000+02"
+        #backupID: 20231123T115354
+
+  externalClusters:
+    name: example-cluster-backup
+    destinationPath: "test"
+    # googleCredentials:
+    #   gkeEnvironment:
+    #   applicationCredentials:
+    # s3Credentials:
+    #   accessKeyId:
+    #   secretAccessKey:
+    #   region:
+    azureCredentials:
+      connectionString:
+    # should be configured in advance  
+        name: azure-creds
+        key: AZURE_BLOB_STRING
+    wal:
+      maxParallel: 8
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "1"
+    limits:
+      memory: "1Gi"
+      cpu: "2"
+
+  pooler:
+    instances: 1
+    type: rw
+    resources:
+      requests:
+        cpu: "0.1"
+        memory: 100Mi
+      limits:
+        cpu: "0.5"
+        memory: 500Mi
+
+    pgbouncer:
+      poolMode: session
+      parameters:
+        max_client_conn: "1000"
+        default_pool_size: "10"
+
+  monitoring:
+    enablePodMonitor: true

@@ -1,0 +1,6 @@
+dependencies:
+- name: cnpg-cluster
+  repository: file://../cnpg-cluster
+  version: 0.1.0
+digest: sha256:19f8616f54928ce0ff928866f30040ed468aa6da0ce41fab1e37692fba9225eb
+generated: "2024-10-31T19:49:07.751987002+02:00"
