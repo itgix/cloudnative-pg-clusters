@@ -1,0 +1,96 @@
+cnpg-cluster:
+  # Default values for cnpg-cluster.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  logLevel: info
+  instances: 1
+
+  bootstrap:
+    initdb:
+      walSegmentSize: 64 # Should be integer
+
+  image:
+    repository: ghcr.io/cloudnative-pg/postgresql
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "14.5"
+
+  storage:
+    # storageClass: managed-csi-cnpg
+    size: 500Gi
+  walStorage:
+    # storageClass: managed-csi-cnpg
+    size: 400Gi
+
+  postgresql:
+    parameters:
+      max_wal_size: "2GB"
+      min_wal_size: "1280MB"
+      max_wal_senders: "16"
+      wal_keep_size: "512MB"
+      # wal_level: "replica" # "logical" # immutable
+      fsync: "on"
+      # hot_standby: "on"   #  immutable
+      log_connections: "false"
+      log_disconnections: "false"
+      log_hostname: "false"
+      checkpoint_timeout: "5min" # Can be higher (15min)
+
+  disaster_recovery: false
+  point_in_time_recovery: false
+
+  backup:
+    enabled: true
+    destinationPath: "" # "https://cnpg.blob.core.windows.net/backup"
+    serverName: "CnpgClusterBackup" # Bucket or Container name
+    azureCredentials:
+      connectionString:
+        name: azure-credentials
+        key: AZURE_BLOB_STRING
+    wal:
+      # compression:  # gzip
+    data:
+      # compression:  # gzip
+      immediateCheckpoint: true
+      jobs: 8
+    retentionPolicy: "30d" 
+
+  scheduledBackups:
+    suspend: false
+    immediate: true
+    schedule: "0 0 0 * * *" # UTC
+
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "4"
+    limits:
+      memory: "4Gi"
+      cpu: "4"
+
+  pooler:
+    instances: 1
+    type: rw
+    resources:
+      requests:
+        cpu: "0.1"
+        memory: 100Mi
+      limits:
+        cpu: "0.5"
+        memory: 500Mi
+
+    pgbouncer:
+      poolMode: session
+      parameters:
+        max_client_conn: "1000"
+        default_pool_size: "10"
+
+  monitoring:
+    enablePodMonitor: true
+
+  # affinity:
+  #  enablePodAntiAffinity: true
+
+  podAnnotations: {}
+  nodeSelector: {}
