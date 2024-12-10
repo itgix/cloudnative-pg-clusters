@@ -1,0 +1,89 @@
+cnpg-cluster:
+  # Default values for cnpg-cluster.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  logLevel: debug
+  instances: 1
+
+  image:
+    repository: ghcr.io/cloudnative-pg/postgresql
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "14.5"
+
+  storage:
+    # storageClass: managed-csi-cnpg
+    size: 500Gi
+  walStorage:
+    # storageClass: managed-csi-cnpg
+    size: 400Gi
+
+  postgresql:
+    parameters:
+      max_wal_size: "2GB"
+      min_wal_size: "640MB"
+      max_wal_senders: "16"
+      wal_keep_size: "512MB"
+      # wal_level: "replica" # "logical" # immuta
+      fsync: "on"
+      # hot_standby: "on"   #  immutable
+      log_connections: "false"
+      log_disconnections: "false"
+      log_hostname: "false"
+      checkpoint_timeout: "5min" # Can be higher (15min)
+
+  disaster_recovery: true
+  point_in_time_recovery: true
+  bootstrap:
+    recovery:
+      # Recovery object store containing WAL archive and base backups
+      source: CnpgClusterBackup
+      recoveryTarget:
+        # Time base target for the recovery
+        targetTime: "2024-01-16 21:37:30.0000+02"
+        #backupID: 20231123T115354
+
+  externalClusters:
+    name: CnpgClusterBackup
+    destinationPath: "https://cnpgb.blob.core.windows.net/backup"
+    azureCredentials:
+      connectionString:
+        name: azure-credentials
+        key: AZURE_BLOB_STRING
+    wal:
+      maxParallel: 3
+
+  resources:
+    requests:
+      memory: "10Gi"
+      cpu: "3"
+    limits:
+      memory: "10Gi"
+      cpu: "3"
+
+  pooler:
+    instances: 1
+    type: rw
+    resources:
+      requests:
+        cpu: "0.1"
+        memory: 100Mi
+      limits:
+        cpu: "0.5"
+        memory: 500Mi
+
+    pgbouncer:
+      poolMode: session
+      parameters:
+        max_client_conn: "1000"
+        default_pool_size: "10"
+
+  monitoring:
+    enablePodMonitor: true
+
+  # affinity:
+  #   enablePodAntiAffinity: true
+
+  podAnnotations: {}
+  nodeSelector: {}
