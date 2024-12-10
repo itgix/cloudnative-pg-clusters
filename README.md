@@ -1,15 +1,14 @@
 
-# CloudNativePG Helm Clusters
-CloudNativePG Helm Charts for Standalone, Backup, PITR and Replica Cluster.
+# CloudNativePG Helm Clusters Charts
+CloudNativePG Helm Charts for Standalone, Backup, PITR (Point-in-Time Recovery) and Replica Cluster.
 
+## Prerequisites
 
-# Prerequisites
-
-## CloudNativePG Helm Charts
+### CloudNativePG Helm Charts
 
 [![Stack Overflow](https://img.shields.io/badge/stackoverflow-cloudnative--pg-blue?logo=stackoverflow&logoColor=%23F48024)](https://stackoverflow.com/questions/tagged/cloudnative-pg) [![GitHub License](https://img.shields.io/github/license/cloudnative-pg/charts)](https://github.com/cloudnative-pg/charts/blob/main/LICENSE)
 
-## Operator chart
+### Operator chart
 
 Helm chart to install the
 [CloudNativePG operator](https://cloudnative-pg.io), originally created and sponsored by
@@ -17,6 +16,7 @@ Helm chart to install the
 running in private, public, or hybrid cloud environments.
 
 **NOTE**: supports only the latest point release of the CloudNativePG operator.
+
 ```console
 helm repo add cnpg https://cloudnative-pg.github.io/charts
 helm upgrade --install cnpg \
@@ -25,40 +25,44 @@ helm upgrade --install cnpg \
   cnpg/cloudnative-pg
 ```
 
-Refer to the [Operator Chart documentation](charts/cloudnative-pg/README.md) for advanced configuration and monitoring.
+Refer to the [Operator Chart documentation](https://github.com/cloudnative-pg/cloudnative-pg) for advanced configuration and monitoring.
 
-# Cluster charts
+## Cluster charts
 
 Helm charts to install a CloudNativePG database cluster.
 
+#### Standalone Cluster
 ```console
 helm upgrade --install cnpg-cluster \
   helm/cnpg-cluster \
   --namespace cnpg-cluster \
-  --create-namespace \
+  --create-namespace 
 ```
 
+#### Backup Cluster 
 ```console
 helm upgrade --install cnpg-cluster-backup \
   charts/cnpg-cluster-backup \
   --namespace cnpg-backup \
-  --create-namespace \
+  --create-namespace 
 ```
 
+#### Point-in-Time Recovery (PITR) Cluster
 ```console
 helm upgrade --install cnpg-cluster-pitr \
   charts/cnpg-cluster-pitr \
   --namespace cnpg-pitr \
-  --create-namespace \
+  --create-namespace 
 ```
 
+#### Replica Cluster
 ```console
 helm upgrade --install cnpg-cluster-replica \
   charts/cnpg-cluster-replica \
   --namespace cnpg-replica \
-  --create-namespace \
+  --create-namespace 
 ```
 
-Clusters names and namespaces can be changed according to the purpose of the cluster/databse.
-
-Refer to the [Cluster Chart documentation](charts/cluster/README.md) for advanced configuration options.
+**Note:** Customize cluster names and namespaces to suit your application requirements. 
+Refer to the provided [example configurations ](charts/examples) for guidance on deploying different cluster setups.
+Refer to the [Cluster Chart documentation](https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/README.md) for advanced configuration options.
